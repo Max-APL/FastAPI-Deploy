@@ -5,7 +5,7 @@ from clientSquema import Cliente, ClienteBaseModel, fake_db_clientes
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Cliente])
+@router.get("/all", response_model=List[Cliente])
 async def obtener_clientes():
     print(fake_db_clientes)
     return [Cliente(**cliente) for cliente in fake_db_clientes]
