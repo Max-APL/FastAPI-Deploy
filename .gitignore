@@ -1,0 +1,9 @@
+
+.venv
+.idea
+__pycache__
+
+
+# Ignorar archivos de compilación
+dist/
+build/
