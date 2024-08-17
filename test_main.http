@@ -1,0 +1,50 @@
+# Test your FastAPI endpoints
+
+GET http://127.0.0.1:8000/
+Accept: application/json
+
+###
+
+GET http://127.0.0.1:8000/hello/User
+Accept: application/json
+
+###
+
+GET https://xh5oo466f6calu3fnxcvydx6ji0uopmb.lambda-url.us-east-2.on.aws/client/CLI001
+Accept: application/json
+
+
+###
+GET https://xh5oo466f6calu3fnxcvydx6ji0uopmb.lambda-url.us-east-2.on.aws/client/
+Accept: application/json
+
+
+###
+POST http://127.0.0.1:8000/crear
+Content-Type: application/json
+
+{
+        "cod_cli": "CLI006",
+        "nombre": "María6",
+        "apellido": "Gómez",
+        "direccion": "Calle Secundaria 456",
+        "telefono": "555-5678",
+        "email": "maria.gomez@example.com",
+        "fecha_nac": "1990-08-22",
+        "sexo": "F"
+ }
+
+
+###
+PUT http://127.0.0.1:8000/actualizar/CLI006
+Content-Type: application/json
+
+{
+        "nombre": "María66",
+        "apellido": "Gómez6",
+        "direccion": "Calle Secundaria 4566",
+        "telefono": "555-56786",
+        "email": "maria.gomez@example.com6",
+        "fecha_nac": "1990-08-26",
+        "sexo": "F"
+ }
