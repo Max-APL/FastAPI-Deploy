@@ -8,3 +8,6 @@ __pycache__
 # Ignorar archivos de compilación
 dist/
 build/
+# Editor directories and files
+.idea
+.vscode
