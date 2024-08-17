@@ -10,17 +10,17 @@ Accept: application/json
 
 ###
 
-GET https://xh5oo466f6calu3fnxcvydx6ji0uopmb.lambda-url.us-east-2.on.aws/client/CLI001
+GET http://127.0.0.1:8000/client/CLI001
 Accept: application/json
 
 
 ###
-GET https://xh5oo466f6calu3fnxcvydx6ji0uopmb.lambda-url.us-east-2.on.aws/client/
+GET http://127.0.0.1:8000/client/
 Accept: application/json
 
 
 ###
-POST http://127.0.0.1:8000/crear
+POST http://127.0.0.1:8000/client/crear
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 
 
 ###
-PUT http://127.0.0.1:8000/actualizar/CLI006
+PUT http://127.0.0.1:8000/client/actualizar/CLI006
 Content-Type: application/json
 
 {
@@ -51,5 +51,5 @@ Content-Type: application/json
 
 
 ###
-DELETE http://127.0.0.1:8000/eliminar/CLI005
+DELETE http://127.0.0.1:8000/client/eliminar/CLI005
 Accept: application/json
