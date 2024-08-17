@@ -48,3 +48,8 @@ Content-Type: application/json
         "fecha_nac": "1990-08-26",
         "sexo": "F"
  }
+
+
+###
+DELETE http://127.0.0.1:8000/eliminar/CLI005
+Accept: application/json

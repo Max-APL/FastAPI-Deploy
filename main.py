@@ -125,12 +125,12 @@ async def actualizar_cliente(cliente_id: str, cliente: ClienteBaseModel):
 
 
 @app.delete("/eliminar/{cliente_id}")
-async def eliminar_cliente(cliente_id: int):
+async def eliminar_cliente(cliente_id: str):
     for i, c in enumerate(fake_db_clientes):
         if c["cod_cli"] == cliente_id:
             del fake_db_clientes[i]
             return {"message": "Cliente eliminado"}
-    raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
 
 
