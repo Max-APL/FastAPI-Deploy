@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from typing import List
 
-from clientSquema import Cliente, ClienteBaseModel, fake_db_clientes
+from schema.clientSquema import Cliente, ClienteBaseModel, fake_db_clientes
 
 router = APIRouter()
 

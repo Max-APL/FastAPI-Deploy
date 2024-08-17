@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from mangum import Mangum
 
-import clientRouter
+from router import clientRouter
 
 app = FastAPI()
 handler = Mangum(app)
