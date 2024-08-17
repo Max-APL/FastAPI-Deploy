@@ -1,2 +1,2 @@
 # FastAPI-Deploy
-Despliegue de API simple con python FastAPI en AWS Lambda 
+Despliegue de python FastAPI simple en AWS Lambda
