@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Super Resolution</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/js/jquery.event.move.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/js/jquery.twentytwenty.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/css/twentytwenty.min.css" />
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, #1e1b4b, transparent 40%),
+                radial-gradient(circle at bottom left, #312e81, transparent 40%);
+            padding: 2rem;
+        }
+
+        .container {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        h1 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+        }
+
+        /* Comparison Slider Styles */
+        .comparison-container {
+            display: none;
+            margin-top: 2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        .twentytwenty-container {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .twentytwenty-handle {
+            background: var(--primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        .twentytwenty-before-label:before,
+        .twentytwenty-after-label:before {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-msg {
+            color: #ef4444;
+            display: none;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>SuperRes AI 4x</h1>
+        <p>Enhance clarity and detail with advanced sharpening.</p>
+
+        <div class="upload-area" id="dropZone">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem; color: #94a3b8;">📁</span>
+            <span id="uploadText" style="color: #94a3b8;">Click or Drag & Drop image here</span>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <button class="btn" id="upscaleBtn" disabled style="width: 100%;">
+            <span id="btnText">Upscale & Sharpen</span>
+            <div class="loader" id="loader"></div>
+        </button>
+
+        <p class="error-msg" id="errorMsg"></p>
+
+        <div class="comparison-container" id="comparisonContainer">
+            <div id="compare" class="twentytwenty-container">
+                <!-- Images will be inserted here -->
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                <a id="downloadLink" class="btn"
+                    style="background: #10b981; margin-top: 0; text-decoration: none;">Download Full Res</a>
+                <button class="btn" onclick="location.reload()"
+                    style="background: var(--surface); margin-top: 0; border: 1px solid var(--border);">New
+                    Image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const upscaleBtn = document.getElementById('upscaleBtn');
+        const comparisonContainer = document.getElementById('comparisonContainer');
+        const compareDiv = document.getElementById('compare');
+        const errorMsg = document.getElementById('errorMsg');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        dropZone.addEventListener('drop', e => {
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', e => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            if (files && files[0] && files[0].type.startsWith('image/')) {
+                selectedFile = files[0];
+                document.getElementById('uploadText').textContent = selectedFile.name;
+                upscaleBtn.disabled = false;
+                comparisonContainer.style.display = 'none';
+            } else {
+                showError("Please select a valid image.");
+            }
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+        }
+
+        upscaleBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            upscaleBtn.disabled = true;
+            document.getElementById('btnText').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/upscale', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Processing failed');
+
+                const blob = await response.blob();
+                const resultUrl = URL.createObjectURL(blob);
+
+                // Create Comparison
+                const reader = new FileReader();
+                reader.readAsDataURL(selectedFile);
+                reader.onload = function (e) {
+                    const originalUrl = e.target.result;
+
+                    // Clear previous
+                    compareDiv.innerHTML = '';
+
+                    // Add images
+                    const img1 = document.createElement('img');
+                    img1.src = originalUrl;
+                    img1.style.width = '100%'; // Force fit for comparison logic (visual only)
+
+                    const img2 = document.createElement('img');
+                    img2.src = resultUrl;
+                    img2.style.width = '100%';
+
+                    compareDiv.appendChild(img1);
+                    compareDiv.appendChild(img2);
+
+                    comparisonContainer.style.display = 'block';
+
+                    // Initialize Slider
+                    $(window).trigger("resize");
+                    $("#compare").twentytwenty({
+                        default_offset_pct: 0.5,
+                        before_label: 'Original (Stretched)',
+                        after_label: 'AI Enhanced (4x)',
+                        no_overlay: true
+                    });
+
+                    downloadLink.href = resultUrl;
+                    downloadLink.download = `enhanced_${selectedFile.name}`;
+
+                    upscaleBtn.disabled = false;
+                    document.getElementById('btnText').style.display = 'inline';
+                    document.getElementById('loader').style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error(error);
+                showError("Error processing image.");
+                upscaleBtn.disabled = false;
+                document.getElementById('btnText').style.display = 'inline';
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
