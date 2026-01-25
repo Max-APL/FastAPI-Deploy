@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import io
 from model import sr_model
@@ -8,6 +9,14 @@ app = FastAPI(
     title="TensorFlow Image Super-Resolution API",
     description="API to upscale images using TensorFlow",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 handler = Mangum(app)

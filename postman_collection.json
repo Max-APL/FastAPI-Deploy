@@ -1,0 +1,61 @@
+{
+    "info": {
+        "_postman_id": "fastapi-deploy-collection",
+        "name": "FastAPI Deployment",
+        "description": "Colección de API para el servicio de Superresolución de Imágenes con TensorFlow",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Root",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        ""
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Upscale Image",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "file",
+                            "type": "file",
+                            "description": "Archivo de imagen para escalar"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/upscale",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "upscale"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000",
+            "type": "string"
+        }
+    ]
+}
