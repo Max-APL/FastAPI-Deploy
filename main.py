@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import io
-from model import sr_model
+from model import image_enhancer
 
 app = FastAPI(
     title="Marketing Media Enhancement API",
@@ -45,16 +45,13 @@ async def enhance_media(
         contents = await file.read()
         
         # 1. Preprocess
-        input_tensor = sr_model.preprocess(contents)
+        input_image = image_enhancer.preprocess(contents)
         
-        # 2. Inference (Upscale)
-        upscaled_image = sr_model.predict(input_tensor)
-
-        # 3. Platform Optimization
-        optimized_image = sr_model.resize_for_platform(upscaled_image, platform)
+        # 2. Platform Optimization (Directly on preprocessed image, skipping AI upscale)
+        optimized_image = image_enhancer.resize_for_platform(input_image, platform)
         
-        # 4. Postprocess
-        output_bytes = sr_model.postprocess(optimized_image)
+        # 3. Postprocess
+        output_bytes = image_enhancer.postprocess(optimized_image)
         
         return StreamingResponse(io.BytesIO(output_bytes), media_type="image/png")
         
