@@ -2,7 +2,9 @@ import time
 import subprocess
 import sys
 import os
-import requests
+import urllib.request
+import urllib.parse
+import json
 import cv2
 import numpy as np
 
@@ -29,26 +31,56 @@ def verify_api():
         
         # 1. Test Root Endpoint
         print("Testing root endpoint...")
-        resp = requests.get(f"{base_url}/")
-        assert resp.status_code == 200
-        assert "Marketing Media Enhancement API" in resp.json()["message"]
-        print("Root endpoint verified.")
+        with urllib.request.urlopen(f"{base_url}/") as response:
+            assert response.status == 200
+            data = json.loads(response.read().decode())
+            assert "Marketing Media Enhancement API" in data["message"]
+            print("Root endpoint verified.")
         
+        # Function to post multipart form data
+        def post_image(url, filepath, params=None):
+            boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW'
+            data = []
+            
+            # Add file
+            with open(filepath, 'rb') as f:
+                file_content = f.read()
+                
+            data.append(f'--{boundary}'.encode())
+            data.append(f'Content-Disposition: form-data; name="file"; filename="{os.path.basename(filepath)}"'.encode())
+            data.append('Content-Type: image/png'.encode())
+            data.append(b'')
+            data.append(file_content)
+            
+            data.append(f'--{boundary}--'.encode())
+            data.append(b'')
+            
+            body = b'\r\n'.join(data)
+            
+            full_url = url
+            if params:
+                query_string = urllib.parse.urlencode(params)
+                full_url = f"{url}?{query_string}"
+                
+            req = urllib.request.Request(full_url, data=body, method='POST')
+            req.add_header('Content-Type', f'multipart/form-data; boundary={boundary}')
+            
+            with urllib.request.urlopen(req) as response:
+                return response.read()
+
         # 2. Test Enhancement with Platform (Instagram Story)
         print("Testing /enhance-media with platform='instagram_story'...")
-        with open("test_input.png", "rb") as f:
-            files = {"file": ("test_input.png", f, "image/png")}
-            params = {"platform": "instagram_story", "campaign_id": "test_campaign"}
-            resp = requests.post(f"{base_url}/enhance-media", files=files, params=params)
-        
-        assert resp.status_code == 200
+        params = {"platform": "instagram_story", "campaign_id": "test_campaign"}
+        content = post_image(f"{base_url}/enhance-media", "test_input.png", params)
         
         # Save output
         with open("output_ig.png", "wb") as f:
-            f.write(resp.content)
+            f.write(content)
             
         # Verify dimensions
         img = cv2.imread("output_ig.png")
+        if img is None:
+             raise Exception("Failed to read output_ig.png")
         h, w = img.shape[:2]
         print(f"Output dimensions: {w}x{h}")
         assert w == 1080
@@ -57,17 +89,15 @@ def verify_api():
 
         # 3. Test Enhancement with Platform (Twitter Post)
         print("Testing /enhance-media with platform='twitter_post'...")
-        with open("test_input.png", "rb") as f:
-            files = {"file": ("test_input.png", f, "image/png")}
-            params = {"platform": "twitter_post"}
-            resp = requests.post(f"{base_url}/enhance-media", files=files, params=params)
+        params = {"platform": "twitter_post"}
+        content = post_image(f"{base_url}/enhance-media", "test_input.png", params)
             
-        assert resp.status_code == 200
-        
         with open("output_twitter.png", "wb") as f:
-            f.write(resp.content)
+            f.write(content)
             
         img = cv2.imread("output_twitter.png")
+        if img is None:
+             raise Exception("Failed to read output_twitter.png")
         h, w = img.shape[:2]
         print(f"Output dimensions: {w}x{h}")
         assert w == 1200
@@ -78,17 +108,18 @@ def verify_api():
 
     except Exception as e:
         print(f"Verification failed: {e}")
-        # Print server output if failed
-        outs, errs = proc.communicate(timeout=1)
-        print("Server Output:", outs.decode())
-        print("Server Error:", errs.decode())
+        # Print server output if failed (non-blocking read would be better but simple here)
+        # We can't easily get stdout/stderr here without blocking if verify_api fails early
+        # but killing process will release file handles.
         raise e
     finally:
         proc.terminate()
         proc.wait()
+        # Print logs
+        outs, errs = proc.communicate(timeout=1)
+        if outs: print("Server Output:", outs.decode())
+        if errs: print("Server Error:", errs.decode())
 
 if __name__ == "__main__":
     create_dummy_image()
-    # Install requests if not present? Assumed present or using standard lib would be safer but requests is cleaner.
-    # If requests fails we catch it.
     verify_api()
